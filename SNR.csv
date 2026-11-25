@@ -1,0 +1,7 @@
+﻿Width τ of the coincidence window [ns];Delay Δt B to T [ns];B&T Coincidence rate [Hz];T Single detection rate [Hz];B Single detection rate [Hz];Delay Δt' B to T [ns];B&T Coincidence rate [Hz];T Single detection rate [Hz];B Single detection rate [Hz];Expected accidental coincidence rate [Hz[;SNR
+1;Delay Δt B to T [ns];245;1,72E+05;4,16E+03;Delay Δt B to T [ns];4,00E-01;1,72E+05;4,20E+03;0,7233363;611,5
+2;Delay Δt B to T [ns];460;1,72E+05;4,15E+03;Delay Δt B to T [ns];1;1,72E+05;4,16E+03;1,4312394;459
+3;Delay Δt B to T [ns];586;1,72E+05;4,15E+03;Delay Δt B to T [ns];1,9;1,72E+05;4,19E+03;2,1582045;307,4210526
+4;Delay Δt B to T [ns];646;1,72E+05;4,19E+03;Delay Δt B to T [ns];3,6;1,72E+05;4,17E+03;2,865624;178,4444444
+5;Delay Δt B to T [ns];660;1,72E+05;4,23E+03;Delay Δt B to T [ns];4,5;1,72E+05;4,21E+03;3,615531;145,6666667
+6;Delay Δt B to T [ns];658;1,72E+05;4,15E+03;Delay Δt B to T [ns];5,6;1,72E+05;4,19E+03;4,31892;116,5
