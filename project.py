@@ -49,10 +49,9 @@ def coherence_plot():
 
     for i, file_name in enumerate(files):
         dx = -46 + 10*i
-        with open(file_name, newline='') as csvfile:
-            csvreader = csv.reader(csvfile, delimiter=' ', quotechar='|')
-            for row in csvreader:
-                if row[0] == "Stage":
+        with open(file_name) as csvfile:
+            for k, row in enumerate(csvfile):
+                if k == 0:
                     continue
                 stage_positions.append(get_val(row, 0) + dx)
                 coincidences.append(get_val(row, 1))
@@ -60,7 +59,9 @@ def coherence_plot():
     plt.plot(stage_positions, coincidences, "bo", ms=2)
     plt.ylabel(r"Coincidence rates $R_{T&B}$ (Hz)",size=12)
     plt.xlabel(r"Stage position ($\mu$m)",size=12)
+    plt.title("Estimating coherence length",size=12)
     plt.tight_layout()
+    plt.grid(True)
     plt.show()
 
 def interference():
@@ -71,13 +72,25 @@ def interference():
         for k, row in enumerate(csvfile):
             if k == 0:
                 continue
-            print(row)
             stage_positions.append(get_val(row, 0))
             coincidences.append(get_val(row, 1))
     
     plt.figure()
-    plt.plot(stage_positions, coincidences, "r-", lw=2)
+    
+
+    def fit(x, a, b, c, d):
+        return a * np.sin(b*x + c) + d
+    p0 = [1000, 2*np.pi/0.4, 0, 1400]
+    par, parcov = curve_fit(f=fit, xdata=stage_positions, ydata=coincidences, p0=p0)
+    x = np.linspace(np.min(stage_positions), np.max(stage_positions), 2000)
+    y = par[0] * np.sin(par[1]*x + par[2]) + par[3]
+    
+    
     plt.plot(stage_positions, coincidences, "ro", ms=4)
+    plt.plot(x, y, "-", color="tab:blue", lw=2)
+
+
+    plt.legend(["Measured", rf"Fitted: $\Delta L = {round(2*np.pi/par[1], 4)} \mu$m"], loc=1)
     plt.xlabel(r"Stage position ($\mu$m)", size=12)
     plt.ylabel(r"Coincidence rate $R_{T&B}$ (Hz)",size=12)
     plt.title("Single photon interference", size=12)
@@ -148,19 +161,43 @@ def visibility():
     max_rates = np.array(max_rates)
     min_rates = np.array(min_rates)
     visibility = (max_rates - min_rates) / (max_rates + min_rates)
-    
-    def sinc(x, A, k):
-        return A*np.sin(k*x)**2 / x**2
 
-    param, param_cov = curve_fit(sinc, stage_positions, visibility)
+    def sinc2(x, A, k, x0):
+        u = k * (x - x0)
+        return np.abs( A * np.sinc(u / np.pi) )
 
+    # Initial guess
+    p0 = [0.83915639, 0.07153448, -12.09393824]
+
+    param, param_cov = curve_fit(f=sinc2, xdata=stage_positions, ydata=visibility, p0=p0)
     print(param)
-    print(param_cov)
     
     plt.figure()
+    
     plt.plot(stage_positions, visibility, "o", color="tab:blue", ms=6)
-    plt.grid(True)
 
+
+    x = np.linspace(-80,60,5000)
+    u = param[1] * (x - param[2])
+    y = np.abs(param[0] * np.sinc(u / np.pi))
+    plt.plot(x, y, "-", color="tab:orange", lw=2)
+
+    y_thresh = np.max(y)/np.e
+    points = []
+    for i in range(1, len(y)):
+        if (y[i] - y_thresh)*(y[i-1] - y_thresh) < 0:
+            points.append((x[i], y[i]))
+    x1, y1 = points[0]
+    x2, y2 = points[1]
+    plt.plot([x1, x2], [y1, y2], "-", color="black", lw=2)
+    l_c = np.abs(x2-x1)
+
+    plt.grid(True)
+    plt.xlabel(r"Stage position ($\mu$m)", size=12)
+    plt.ylabel("Visibility",size=12)
+    plt.title("Visibility plot",size=12)
+    plt.tight_layout()
+    plt.legend(["Measured", "Fitted", rf"$l_c={round(l_c,2)} \mu m$"])
     plt.show()
 
     
