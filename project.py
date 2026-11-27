@@ -58,12 +58,13 @@ def coherence_plot():
                     continue
                 stage_positions.append(get_val(row, 0) + dx)
                 coincidences.append(get_val(row, 1))
+    stage_positions = np.array(stage_positions) - 14
     err = np.sqrt(np.array(coincidences))
     plt.figure()
     plt.errorbar(stage_positions, coincidences, yerr=err, fmt="o", color="tab:blue", ms=2, capsize=1)
     plt.ylabel(r"Coincidence rates $R_{T&B}$ (Hz)",size=12)
     plt.xlabel(r"Stage position ($\mu$m)",size=12)
-    plt.title("Estimating coherence length",size=12)
+    plt.title("Visualizing coherence length",size=12)
     plt.tight_layout()
     plt.grid(True)
     plt.show()
@@ -192,6 +193,7 @@ def visibility():
             stage_positions.append(get_val(row, 0))
             max_rates.append(get_val(row, 2))
             min_rates.append(get_val(row, 3))
+    stage_positions = np.array(stage_positions) + 14
     max_rates = np.array(max_rates)
     min_rates = np.array(min_rates)
     visibility = (max_rates - min_rates) / (max_rates + min_rates)
@@ -215,13 +217,13 @@ def visibility():
     par_sinc, _cov = curve_fit(f=sinc, xdata=stage_positions, ydata=visibility, p0=p0)
     par_sinc2, _cov2 = curve_fit(f=sinc2, xdata=stage_positions, ydata=visibility, p0=p0)
     
-    x = np.linspace(-80,60,5000)
+    x = np.linspace(-60,70,5000)
     A, k, x0 = par_sinc
     A2, k2, x02 = par_sinc2
     y = sinc(x, A, k, x0)
     y2 = sinc2(x, A2, k2, x02)
-    plt.plot(x, y, "--", color="tab:blue", lw=4)
-    plt.plot(x, y2, "--", color="tab:orange", lw=2)
+    plt.plot(x, y, "-", color="tab:blue", lw=3)
+    #plt.plot(x, y2, "--", color="tab:orange", lw=2)
 
     # Chi2:
     pos = np.array(stage_positions)
@@ -250,14 +252,14 @@ def visibility():
     plt.ylabel("Visibility",size=12)
     plt.title("Visibility plot",size=12)
     plt.tight_layout()
-    plt.legend([rf"|sinc| $\chi^2$/ndof={round(chi2,3)}", rf"sinc2. $\chi^2$/ndof={round(chi2_sinc2,3)}", rf"$l_c={round(l_c,2)} \mu m$","Measured"], loc=1)
+    plt.legend([rf"|sinc| $\chi^2$/ndof={round(chi2,3)}", rf"$l_c={round(l_c,2)} \mu m$","Measured"], loc=1)
     plt.show()
 
     
 if __name__ == "__main__":
     #time_delay()
-    SNR_plots()
-    #coherence_plot()
+    #SNR_plots()
+    coherence_plot()
     #interference()
     #ryans_plots()
-    #visibility()
+    visibility()
